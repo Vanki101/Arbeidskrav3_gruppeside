@@ -3,14 +3,20 @@ import { useParams, Link } from 'react-router-dom';
 import { client, urlFor } from '../sanityClient';
 import './MemberProfile.css';
 
+// MemberProfile-komponenten viser detaljert informasjon om et enkelt medlem
+// inkludert bilde, biografi, interesser og personlig arbeidslogg
 function MemberProfile() {
+  // Hent firstName fra URL-parameteren
   const { firstName } = useParams();
+  // State for å lagre medlemsdata og laste-status
   const [memberData, setMemberData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Hent medlemsdata fra Sanity når komponenten lastes eller URL endres
   useEffect(() => {
     client
       .fetch(
+        // GROQ-spørring for å hente detaljert informasjon om medlemmet
         `*[_type == "member" && firstName == $firstName][0] {
           firstName,
           lastName,
@@ -20,6 +26,7 @@ function MemberProfile() {
           interests,
           "logs": logs[] {
             description,
+            date,
             hours,
             _createdAt
           }
@@ -36,16 +43,20 @@ function MemberProfile() {
       });
   }, [firstName]);
 
+  // Vis laster-indikator mens data hentes
   if (loading) {
     return <div className="loading">Laster...</div>;
   }
 
+  // Vis feilmelding hvis medlemmet ikke finnes
   if (!memberData) {
     return <div className="not-found">Fant ikke medlemmet</div>;
   }
 
   // Formater dato for loggføringer
-  const formatDate = (dateString) => {
+  const formatDate = (log) => {
+    // Bruk date-feltet hvis det finnes, ellers bruk _createdAt
+    const dateString = log.date || log._createdAt;
     const date = new Date(dateString);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   };
@@ -53,6 +64,7 @@ function MemberProfile() {
   return (
     <div className="member-profile">
       <div className="profile-container">
+        {/* Profilheader med bilde og grunnleggende info */}
         <div className="profile-header">
           <div className="profile-image-container">
             {memberData.image ? (
@@ -72,6 +84,7 @@ function MemberProfile() {
           </div>
         </div>
         
+        {/* Biografi-seksjon (vises kun hvis den finnes) */}
         {memberData.biography && (
           <div className="profile-section">
             <h2>Biografi</h2>
@@ -79,6 +92,7 @@ function MemberProfile() {
           </div>
         )}
         
+        {/* Interesser-seksjon (vises kun hvis det finnes interesser) */}
         {memberData.interests && memberData.interests.length > 0 && (
           <div className="profile-section">
             <h2>Interesser</h2>
@@ -90,6 +104,7 @@ function MemberProfile() {
           </div>
         )}
         
+        {/* Loggføringer-seksjon */}
         <div className="profile-section">
           <h2>{memberData.firstName}s loggføringer</h2>
           {memberData.logs && memberData.logs.length > 0 ? (
@@ -105,7 +120,7 @@ function MemberProfile() {
                 <tbody>
                   {memberData.logs.map((log, index) => (
                     <tr key={index}>
-                      <td>{formatDate(log._createdAt)}</td>
+                      <td>{formatDate(log)}</td>
                       <td>{log.description}</td>
                       <td>{log.hours} timer</td>
                     </tr>
@@ -118,6 +133,7 @@ function MemberProfile() {
           )}
         </div>
         
+        {/* Lenke tilbake til forsiden */}
         <div className="back-section">
           <Link to="/" className="back-link">Tilbake til forsiden</Link>
         </div>

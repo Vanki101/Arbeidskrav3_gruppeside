@@ -4,13 +4,17 @@ import MemberCard from '../components/MemberCard';
 import WorkLog from '../components/WorkLog';
 import './Home.css';
 
+// Home-komponenten viser forsiden med oversikt over alle medlemmer
+// og den samlede arbeidsloggen for gruppen
 function Home() {
+  // State for å lagre medlemmer og arbeidslogger
   const [members, setMembers] = useState([]);
   const [allLogs, setAllLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Hent data fra Sanity når komponenten lastes
   useEffect(() => {
-    // Hent gruppemedlemmer
+    // Hent gruppemedlemmer med grunnleggende informasjon
     client
       .fetch(`*[_type == "member"] {
         _id,
@@ -26,12 +30,13 @@ function Home() {
         console.error("Feil ved henting av medlemmer:", error);
       });
 
-    // Hent alle loggføringer
+    // Hent alle loggføringer fra alle medlemmer
     client
       .fetch(`*[_type == "member"] {
         firstName,
         "logs": logs[] {
           description,
+          date,
           hours,
           _createdAt
         }
@@ -59,6 +64,7 @@ function Home() {
       });
   }, []);
 
+  // Vis laster-indikator mens data hentes
   if (loading) {
     return <div className="loading">Laster innhold...</div>;
   }
@@ -66,6 +72,7 @@ function Home() {
   return (
     <div className="home">
       <h1>Gruppemedlemmer</h1>
+      {/* Grid med medlemskort */}
       <div className="member-grid">
         {members.length > 0 ? (
           members.map(member => (
@@ -76,7 +83,8 @@ function Home() {
         )}
       </div>
       
-      <h2>Arbeidslogg</h2>
+     
+      {/* Arbeidslogg for hele gruppen */}
       {allLogs.length > 0 ? (
         <WorkLog logs={allLogs} />
       ) : (
