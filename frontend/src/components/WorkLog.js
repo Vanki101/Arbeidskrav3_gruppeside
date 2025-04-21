@@ -1,6 +1,8 @@
 import React from 'react';
 import './WorkLog.css';
 
+// WorkLog-komponenten viser en tabell med arbeidslogg
+// Kan vise logg for ett medlem eller for hele gruppen
 function WorkLog({ logs, memberName }) {
   // Sorter loggene etter dato (nyeste først)
   const sortedLogs = logs ? [...logs].sort((a, b) => {
@@ -19,27 +21,28 @@ function WorkLog({ logs, memberName }) {
 
   return (
     <div className="work-log">
+      {/* Overskrift - tilpasses basert på om det er for ett medlem eller hele gruppen */}
       <h2>{memberName ? `${memberName}s loggføringer` : 'Arbeidslogg'}</h2>
       <table className="log-table">
         <thead>
           <tr>
             <th>Dato</th>
+            {/* Viser navnekolonne kun på gruppens samlede logg */}
             {!memberName && <th>Navn</th>}
             <th>Oppgave</th>
             <th>Timer</th>
           </tr>
         </thead>
         <tbody>
-          {sortedLogs.map((log, index) => {
-            return (
-              <tr key={index}>
-                <td>{formatDate(log)}</td>
-                {!memberName && <td>{log.memberName}</td>}
-                <td>{log.description}</td>
-                <td>{log.hours} timer</td>
-              </tr>
-            );
-          })}
+          {sortedLogs.map((log, index) => (
+            <tr key={index}>
+              <td>{formatDate(log)}</td>
+              {/* Viser navn kun på gruppens samlede logg */}
+              {!memberName && <td>{log.memberName}</td>}
+              <td>{log.description}</td>
+              <td>{log.hours} timer</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

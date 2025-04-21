@@ -17,7 +17,6 @@ function Header() {
         firstName
       }`)
       .then((data) => {
-        // Oppdater state med de hentede medlemmene
         setMembers(data);
       })
       .catch(console.error);
@@ -26,7 +25,7 @@ function Header() {
   return (
     <header className="header">
       {/* Logo/gruppenavn */}
-      <div className="logo">TEAM EDAEVE</div>
+      <div className="logo">TEAM EDAEV</div>
       {/* Navigasjonsmeny */}
       <nav>
         {/* Link til forsiden */}
